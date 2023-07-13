@@ -31,7 +31,12 @@ spec:
       key.converter: org.apache.kafka.connect.storage.StringConverter
       value.converter: io.confluent.connect.avro.AvroConverter
       value.converter.schema.registry.url: https://psrc-epk8y.australia-southeast1.gcp.confluent.cloud:8081
-      value.converter.schema.registry.basic.auth.user.info: ""
+      value.converter.schema.registry.basic.auth.user.info: W6HED5OHTCVPBXMF:5EXqg1LqOdNz4b3JX6Dyg3OGa/2bTcnStGP0cS4JbYM84XXuEI22ScUqDRXlKJhz
+      # securty
+      security.protocol: PLAINTEXT
+      producer.security.protocol: PLAINTEXT
+      consumer.security.protocol: PLAINTEXT
+      admin.security.protocol: PLAINTEXT
   ############### TARGET CLUSTER (Passive) ################        
   - alias: "kafka-broker-1"
     bootstrapServers: kafka-broker-1-kafka-bootstrap:9093
