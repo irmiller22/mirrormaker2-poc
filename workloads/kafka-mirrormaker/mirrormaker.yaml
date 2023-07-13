@@ -7,9 +7,32 @@ spec:
   version: 3.4.0
   replicas: 1
   # The cluster alias for Kafka Connect
-  connectCluster: "kafka-broker-2"
+  connectCluster: "kafka-broker-1"
   clusters:
   ############### SOURCE CLUSTER (Active) ################
+  - alias: "dev-gcp-us-west1-yak"
+    bootstrapServers: pkc-lgk0v.us-west1.gcp.confluent.cloud:9092
+    tls: 
+      trustedCertificates:
+      - secretName: dev-gcp-us-west1-yak
+        certificate: ca.crt
+    authentication: 
+      type: plain
+      username: JV2YK27A4MKMFKLR
+      passwordSecret:
+        secretName: dev-gcp-us-west1-yak
+        password: user.password
+    config:
+      # -1 means it will use the default replication factor configured in the broker
+      config.storage.replication.factor: -1
+      offset.storage.replication.factor: -1
+      status.storage.replication.factor: -1   
+      # avro serialization / deserialization
+      key.converter: org.apache.kafka.connect.storage.StringConverter
+      value.converter: io.confluent.connect.avro.AvroConverter
+      value.converter.schema.registry.url: https://psrc-epk8y.australia-southeast1.gcp.confluent.cloud:8081
+      value.converter.schema.registry.basic.auth.user.info: ""
+  ############### TARGET CLUSTER (Passive) ################        
   - alias: "kafka-broker-1"
     bootstrapServers: kafka-broker-1-kafka-bootstrap:9093
     tls: 
@@ -17,37 +40,9 @@ spec:
       - secretName: kafka-broker-1-cluster-ca-cert
         certificate: ca.crt
     authentication: 
-      # type: plain
-      # username: admin-user-1
-      # passwordSecret:
-      #   secretName: admin-user-1
-      #   password: user.password
       type: tls
       certificateAndKey:
         secretName: admin-user-1
-        certificate: user.crt
-        key: user.key
-    config:
-      # -1 means it will use the default replication factor configured in the broker
-      config.storage.replication.factor: -1
-      offset.storage.replication.factor: -1
-      status.storage.replication.factor: -1       
-  ############### TARGET CLUSTER (Passive) ################        
-  - alias: "kafka-broker-2"
-    bootstrapServers: kafka-broker-2-kafka-bootstrap:9093
-    tls: 
-      trustedCertificates:
-      - secretName: kafka-broker-2-cluster-ca-cert
-        certificate: ca.crt
-    authentication: 
-      # type: plain
-      # username: admin-user-2
-      # passwordSecret:
-      #   secretName: admin-user-2
-      #   password: user.password
-      type: tls
-      certificateAndKey:
-        secretName: admin-user-2
         certificate: user.crt
         key: user.key
     config:
@@ -78,8 +73,8 @@ spec:
   #######################
   # Replication flows
   #######################
-  - sourceCluster: "kafka-broker-1"
-    targetCluster: "kafka-broker-2"
+  - sourceCluster: "dev-gcp-us-west1-yak"
+    targetCluster: "kafka-broker-1"
     sourceConnector:
       tasksMax: 6
       config:
