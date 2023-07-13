@@ -11,17 +11,22 @@ spec:
   clusters:
   ############### SOURCE CLUSTER (Active) ################
   - alias: "kafka-broker-1"
-    bootstrapServers: kafka-broker-1-kafka-bootstrap:9092
+    bootstrapServers: kafka-broker-1-kafka-bootstrap:9093
     tls: 
       trustedCertificates:
-      - secretName: kafka-broker-1-clients-ca-cert
+      - secretName: kafka-broker-1-cluster-ca-cert
         certificate: ca.crt
     authentication: 
-      type: plain
-      username: admin-user-1
-      passwordSecret:
+      # type: plain
+      # username: admin-user-1
+      # passwordSecret:
+      #   secretName: admin-user-1
+      #   password: user.password
+      type: tls
+      certificateAndKey:
         secretName: admin-user-1
-        password: user.password
+        certificate: user.crt
+        key: user.key
     config:
       # -1 means it will use the default replication factor configured in the broker
       config.storage.replication.factor: -1
@@ -29,30 +34,39 @@ spec:
       status.storage.replication.factor: -1       
   ############### TARGET CLUSTER (Passive) ################        
   - alias: "kafka-broker-2"
-    bootstrapServers: kafka-broker-2-kafka-bootstrap:9092
+    bootstrapServers: kafka-broker-2-kafka-bootstrap:9093
+    tls: 
+      trustedCertificates:
+      - secretName: kafka-broker-2-cluster-ca-cert
+        certificate: ca.crt
     authentication: 
-      type: plain
-      username: admin-user-2
-      passwordSecret:
+      # type: plain
+      # username: admin-user-2
+      # passwordSecret:
+      #   secretName: admin-user-2
+      #   password: user.password
+      type: tls
+      certificateAndKey:
         secretName: admin-user-2
-        password: user.password
+        certificate: user.crt
+        key: user.key
     config:
       # The following KafkaConnect topics are created by default. You can change the default
       # replication factors (it is 3) and their names here.
       #
       # Kafka topic that stores connector and task status configurations
       # Replication factor for internal topic 'mirrormaker2-cluster-configs'
-      config.storage.replication.factor: 3
+      config.storage.replication.factor: 1
       config.storage.topic: mirrormaker2-cluster-configs
       #
       # Kafka topic that stores connector offsets.
       # Replication factor for internal topic 'mirrormaker2-cluster-offsets'
-      offset.storage.replication.factor: 3
+      offset.storage.replication.factor: 1
       offset.storage.topic: mirrormaker2-cluster-offsets
       #
       # Kafka topic that stores connector and task status updates.
       # Replication factor for internal topic 'mirrormaker2-cluster-status'
-      status.storage.replication.factor: 3
+      status.storage.replication.factor: 1
       status.storage.topic: mirrormaker2-cluster-status
       #
       #ssl.cipher.suites: "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"

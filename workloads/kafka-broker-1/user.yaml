@@ -8,3 +8,20 @@ metadata:
 spec:
   authentication:
     type: tls
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: "*"
+          patternType: literal
+        operations:
+          - Read
+          - Describe
+          - Write
+      - resource:
+          type: group
+          name: "*"
+          patternType: literal
+        operations:
+          - Read
