@@ -12,10 +12,6 @@ spec:
   ############### SOURCE CLUSTER (Active) ################
   - alias: "dev-gcp-us-west1-yak"
     bootstrapServers: pkc-lgk0v.us-west1.gcp.confluent.cloud:9092
-    tls: 
-      trustedCertificates:
-      - secretName: dev-gcp-us-west1-yak
-        certificate: ca.crt
     authentication: 
       type: plain
       username: JV2YK27A4MKMFKLR
@@ -31,16 +27,23 @@ spec:
       key.converter: org.apache.kafka.connect.storage.StringConverter
       value.converter: io.confluent.connect.avro.AvroConverter
       value.converter.schema.registry.url: https://psrc-epk8y.australia-southeast1.gcp.confluent.cloud:8081
-      value.converter.schema.registry.basic.auth.user.info: W6HED5OHTCVPBXMF:5EXqg1LqOdNz4b3JX6Dyg3OGa/2bTcnStGP0cS4JbYM84XXuEI22ScUqDRXlKJhz
+      value.converter.schema.registry.basic.auth.user.info: <username>:<password>
       # securty
-      security.protocol: PLAINTEXT
-      producer.security.protocol: PLAINTEXT
-      consumer.security.protocol: PLAINTEXT
-      admin.security.protocol: PLAINTEXT
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      # producer.security.protocol: PLAINTEXT
+      # consumer.security.protocol: PLAINTEXT
+      # admin.security.protocol: PLAINTEXT
   ############### TARGET CLUSTER (Passive) ################        
   - alias: "kafka-broker-1"
     bootstrapServers: kafka-broker-1-kafka-bootstrap:9093
-    tls: 
+    # authentication:
+    #   type: plain
+    #   username: admin-user-1
+    #   passwordSecret:
+    #     secretName: admin-user-1
+    #     password: password
+    tls:
       trustedCertificates:
       - secretName: kafka-broker-1-cluster-ca-cert
         certificate: ca.crt
@@ -81,13 +84,13 @@ spec:
   - sourceCluster: "dev-gcp-us-west1-yak"
     targetCluster: "kafka-broker-1"
     sourceConnector:
-      tasksMax: 6
+      tasksMax: 1
       config:
         # The replication factor for mirrored topics created at the target cluster
-        replication.factor: 3
+        replication.factor: 1
         # The replication factor for the MirrorSourceConnector 'offset-syncs' internal topic
         # that maps the offsets of the source and target clusters.
-        offset-syncs.topic.replication.factor: 3
+        offset-syncs.topic.replication.factor: 1
         sync.topic.acls.enabled: "false"
         # Defines the separator used for the renaming of remote topics (useful when mirroring ACTIVE / ACTIVE clusters)
         replication.policy.separator: ""
@@ -99,11 +102,11 @@ spec:
     heartbeatConnector:
       config:
         # Internal topic 'heartbeats' created at the target cluster
-        heartbeats.topic.replication.factor: 3
+        heartbeats.topic.replication.factor: 1
     checkpointConnector:
       config:
         # Internal topic '<source-cluster-alias>.checkpoints.internal' created at the target cluster
-        checkpoints.topic.replication.factor: 3
+        checkpoints.topic.replication.factor: 1
         # Override automatic renaming (use this policy for ACTIVE / PASSIVE use cases)
         # Instead of prepending the name with the name of the source cluster, the topic retains its original name
         replication.policy.class: "io.strimzi.kafka.connect.mirror.IdentityReplicationPolicy"        

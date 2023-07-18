@@ -16,12 +16,25 @@ spec:
           name: "*"
           patternType: literal
         operations:
-          - Read
+          - Create
           - Describe
+          - Read
           - Write
+          - DescribeConfigs
       - resource:
           type: group
           name: "*"
           patternType: literal
         operations:
+          - Create
+          - Describe
           - Read
+          - Write
+      - resource:
+          type: cluster
+          name: kafka-broker-1
+          patternType: literal
+        operations:
+          - Describe
+          - DescribeConfigs
+          
