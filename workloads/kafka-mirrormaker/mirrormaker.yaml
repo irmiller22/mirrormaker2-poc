@@ -10,13 +10,13 @@ spec:
   connectCluster: "kafka-broker-1"
   clusters:
   ############### SOURCE CLUSTER (Active) ################
-  - alias: "dev-gcp-us-west1-yak"
+  - alias: "uat-gcp-us-west1-leopard"
     bootstrapServers: pkc-lgk0v.us-west1.gcp.confluent.cloud:9092
     authentication: 
       type: plain
-      username: JV2YK27A4MKMFKLR
+      username: QDDKG5MRZFQ5KG3D
       passwordSecret:
-        secretName: dev-gcp-us-west1-yak
+        secretName: uat-gcp-us-west1-leopard
         password: user.password
     config:
       # -1 means it will use the default replication factor configured in the broker
@@ -26,9 +26,9 @@ spec:
       # avro serialization / deserialization
       key.converter: org.apache.kafka.connect.storage.StringConverter
       value.converter: io.confluent.connect.avro.AvroConverter
-      value.converter.schema.registry.url: https://psrc-epk8y.australia-southeast1.gcp.confluent.cloud:8081
-      value.converter.schema.registry.basic.auth.user.info: <username>:<password>
-      # securty
+      value.converter.schema.registry.url: https://psrc-0xx5p.us-central1.gcp.confluent.cloud
+      value.converter.schema.registry.basic.auth.user.info: ITVIFZFRINOXN3BN:<redacted>
+      # security
       security.protocol: SASL_SSL
       sasl.mechanism: PLAIN
       # producer.security.protocol: PLAINTEXT
@@ -81,7 +81,7 @@ spec:
   #######################
   # Replication flows
   #######################
-  - sourceCluster: "dev-gcp-us-west1-yak"
+  - sourceCluster: "uat-gcp-us-west1-leopard"
     targetCluster: "kafka-broker-1"
     sourceConnector:
       tasksMax: 1
@@ -93,7 +93,7 @@ spec:
         offset-syncs.topic.replication.factor: 1
         sync.topic.acls.enabled: "false"
         # Defines the separator used for the renaming of remote topics (useful when mirroring ACTIVE / ACTIVE clusters)
-        replication.policy.separator: ""
+        replication.policy.separator: "."
         # Override automatic renaming (use this policy for ACTIVE / PASSIVE use cases)
         # Instead of prepending the name with the name of the source cluster, the topic retains its original name
         replication.policy.class: "io.strimzi.kafka.connect.mirror.IdentityReplicationPolicy"

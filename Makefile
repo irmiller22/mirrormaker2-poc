@@ -15,7 +15,7 @@ provision-kafka:
 
 provision-mm2:
 	kubectl kustomize workloads/kafka-mirrormaker | kubectl apply -f -
-	kubectl wait deployment/kafka-mirror-mirrormaker2 --for=condition=Available --timeout=300s -n kafka
+	kubectl wait kafkamirrormaker2/kafka-mirror --for=condition=Ready --timeout=300s -n kafka
 
 teardown-kafka:
 	kubectl delete kafka kafka-broker-1 -n kafka
