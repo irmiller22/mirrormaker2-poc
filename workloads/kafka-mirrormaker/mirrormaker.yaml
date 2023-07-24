@@ -7,82 +7,63 @@ spec:
   version: 3.4.0
   replicas: 1
   # The cluster alias for Kafka Connect
-  connectCluster: "kafka-broker-1"
+  connectCluster: "uat-gcp-us-west1-leopard-confluent"
   clusters:
   ############### SOURCE CLUSTER (Active) ################
-  - alias: "uat-gcp-us-west1-leopard"
+  - alias: "uat-gcp-us-west1-leopard-confluent-sso"
     bootstrapServers: pkc-lgk0v.us-west1.gcp.confluent.cloud:9092
     authentication: 
       type: plain
       username: QDDKG5MRZFQ5KG3D
       passwordSecret:
         secretName: uat-gcp-us-west1-leopard
-        password: user.password
+        password: QDDKG5MRZFQ5KG3D.password
     config:
       # -1 means it will use the default replication factor configured in the broker
       config.storage.replication.factor: -1
       offset.storage.replication.factor: -1
       status.storage.replication.factor: -1   
-      # avro serialization / deserialization
-      key.converter: org.apache.kafka.connect.storage.StringConverter
-      value.converter: io.confluent.connect.avro.AvroConverter
-      value.converter.schema.registry.url: https://psrc-0xx5p.us-central1.gcp.confluent.cloud
-      value.converter.schema.registry.basic.auth.user.info: ITVIFZFRINOXN3BN:<redacted>
       # security
       security.protocol: SASL_SSL
       sasl.mechanism: PLAIN
-      # producer.security.protocol: PLAINTEXT
-      # consumer.security.protocol: PLAINTEXT
-      # admin.security.protocol: PLAINTEXT
   ############### TARGET CLUSTER (Passive) ################        
-  - alias: "kafka-broker-1"
-    bootstrapServers: kafka-broker-1-kafka-bootstrap:9093
-    # authentication:
-    #   type: plain
-    #   username: admin-user-1
-    #   passwordSecret:
-    #     secretName: admin-user-1
-    #     password: password
+  - alias: "uat-gcp-us-west1-leopard-confluent"
+    bootstrapServers: pkc-lgk0v.us-west1.gcp.confluent.cloud:9092
+    authentication:
+      type: plain
+      username: OOECKHKYW5R64RHQ
+      passwordSecret:
+        secretName: uat-gcp-us-west1-leopard
+        password: OOECKHKYW5R64RHQ.password
     tls:
-      trustedCertificates:
-      - secretName: kafka-broker-1-cluster-ca-cert
-        certificate: ca.crt
-    authentication: 
-      type: tls
-      certificateAndKey:
-        secretName: admin-user-1
-        certificate: user.crt
-        key: user.key
+      trustedCertificates: []
     config:
       # The following KafkaConnect topics are created by default. You can change the default
       # replication factors (it is 3) and their names here.
       #
       # Kafka topic that stores connector and task status configurations
       # Replication factor for internal topic 'mirrormaker2-cluster-configs'
-      config.storage.replication.factor: 1
+      config.storage.replication.factor: 3
       config.storage.topic: mirrormaker2-cluster-configs
       #
       # Kafka topic that stores connector offsets.
       # Replication factor for internal topic 'mirrormaker2-cluster-offsets'
-      offset.storage.replication.factor: 1
+      offset.storage.replication.factor: 3
       offset.storage.topic: mirrormaker2-cluster-offsets
       #
       # Kafka topic that stores connector and task status updates.
       # Replication factor for internal topic 'mirrormaker2-cluster-status'
-      status.storage.replication.factor: 1
+      status.storage.replication.factor: 3
       status.storage.topic: mirrormaker2-cluster-status
-      #
-      #ssl.cipher.suites: "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
-      #ssl.enabled.protocols: "TLSv1.2"
-      #ssl.protocol: "TLSv1.2"
-      #compression.type: gzip
-      #batch.size: 8192      
+      # security
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
   mirrors:
   #######################
   # Replication flows
   #######################
-  - sourceCluster: "uat-gcp-us-west1-leopard"
-    targetCluster: "kafka-broker-1"
+  - sourceCluster: "uat-gcp-us-west1-leopard-confluent-sso"
+    targetCluster: "uat-gcp-us-west1-leopard-confluent"
     sourceConnector:
       tasksMax: 1
       config:
@@ -118,8 +99,10 @@ spec:
         #emit.checkpoints.interval.seconds: 60
         # Interval period to refresh consumer groups statuses (Default: 600)
         refresh.groups.interval.seconds: 60
-    topicsPattern: ".*"
-    groupsPattern: ".*"
+    # topicsPattern: ".*"
+    topicsPattern: "eventbus.public.job-management-service.common-job-state.v1"
+    # groupsPattern: ".*"
+    groupsPattern: "ian_miller_mm2_test"
   logging:
     type: inline
     loggers:
